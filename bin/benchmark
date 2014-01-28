@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+require 'benchmark'
+require 'image_benchmarks'
+
+SIZES = [
+  [75, 75],
+  [150, 150],
+  [300, 400],
+  [800, 600],
+]
+
+FILES = Dir.glob("examples/*.jpg")
+
+rmagick_resizer      = ImageBenchmarks::RMagickResizer.new
+minimagick_resizer   = ImageBenchmarks::MinimagickResizer.new
+imagescience_resizer = ImageBenchmarks::ImageScienceResizer.new
+
+def resize_all_with(resizer)
+  FILES.each { |f| resizer.resize(f, SIZES) }
+end
+
+Benchmark.bm(10) do |b|
+  b.report("RMagick") { resize_all_with(rmagick_resizer) }
+  b.report("minimagick") { resize_all_with(minimagick_resizer) }
+  b.report("image_science") { resize_all_with(imagescience_resizer) }
+end
